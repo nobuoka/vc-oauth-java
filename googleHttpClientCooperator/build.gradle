@@ -1,1 +1,23 @@
 apply plugin: 'java'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+def javaApiUrl = 'http://docs.oracle.com/javase/8/docs/api/'
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+    options.links(javaApiUrl)
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.google.http-client:google-http-client:1.19+'
+    compile 'info.vividcode.utils:wscutils:0.2.0+'
+}
