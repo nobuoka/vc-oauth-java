@@ -12,7 +12,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'info.vividcode'
-version = '0.0.1-alpha-SNAPSHOT'
+version = '0.0.2-alpha-SNAPSHOT'
 
 description = "Java library to use google-http-java-client with OAuth 1.0 Protocol."
 
