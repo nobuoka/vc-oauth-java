@@ -1,4 +1,20 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+group = 'info.vividcode'
+version = '0.0.1-alpha-SNAPSHOT'
+
+description = "Java library to use google-http-java-client with OAuth 1.0 Protocol."
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -20,4 +36,76 @@ repositories {
 dependencies {
     compile 'com.google.http-client:google-http-client:1.19+'
     compile 'info.vividcode.utils:wscutils:0.2.0+'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+def pomConfig = {
+    description 'Java library to use google-http-java-client with OAuth 1.0 Protocol.'
+    url 'https://github.com/nobuoka/vc-oauth-java'
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "nobuoka"
+            name "NOBUOKA Yu"
+            email "nobuoka+dev@vividcode.info"
+        }
+    }
+    scm {
+        connection "scm:git:https://github.com/nobuoka/vc-oauth-java.git"
+        developerConnection "scm:git:ssh://git@github.com/nobuoka/vc-oauth-java.git"
+        url "https://github.com/nobuoka/vc-oauth-java"
+    }
+    issueManagement {
+        url "https://github.com/nobuoka/vc-oauth-java/issues"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'oauth-client-ghc'
+
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                def root = asNode()
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+bintray {
+    if (project.hasProperty('bintrayUser')) {
+        user = project.bintrayUser
+    } else {
+        logger.warn("Project property `bintrayUser` must be set if you upload archives to Bintray")
+    }
+    if (project.hasProperty('bintrayKey')) {
+        key = project.bintrayKey
+    } else {
+        logger.warn("Project property `bintrayKey` must be set if you upload archives to Bintray")
+    }
+
+    publications = ['mavenJava']
+    pkg {
+        repo = 'maven'
+        name = 'vc-oauth-java'
+    }
 }
