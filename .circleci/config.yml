@@ -20,7 +20,7 @@ jobs:
           name: Calculate cache key for Maven dependencies
           command: |
             {
-              md5sum .gradle/wrapper/maven-wrapper.properties
+              md5sum gradle/wrapper/gradle-wrapper.properties
               md5sum settings.gradle
               md5sum $(find . -name 'build.gradle')
             } > ~/cache-key-source-gradle
