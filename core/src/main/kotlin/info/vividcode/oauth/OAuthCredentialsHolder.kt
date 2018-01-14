@@ -14,13 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package info.vividcode.oauth.client.tools;
+package info.vividcode.oauth
 
-import info.vividcode.oauth.OAuthCredentialsHolder;
-import kotlin.Pair;
+interface OAuthCredentialsHolder {
+    val clientIdentifier: String
+    val clientSharedSecret: String
 
-import java.util.List;
-
-public interface OAuthParamsGenerator {
-    List<Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod);
+    val tokenIdentifier: String
+    val tokenSharedSecret: String
+    fun setClientCredential(identifier: String, secret: String)
+    fun setTokenCredential(identifier: String, secret: String)
 }
+
+data class ClientCredential(
+        val identifier: String,
+        val sharedSecret: String
+)
+data class TokenCredential(
+        val identifier: String,
+        val sharedSecret: String
+)

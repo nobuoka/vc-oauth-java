@@ -1,0 +1,39 @@
+# Java Gradle CircleCI 2.0 configuration file
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx1600m
+
+    steps:
+      - checkout
+
+      - run:
+          name: Calculate cache key for Maven dependencies
+          command: |
+            {
+              md5sum .gradle/wrapper/maven-wrapper.properties
+              md5sum settings.gradle
+              md5sum $(find . -name 'build.gradle')
+            } > ~/cache-key-source-gradle
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: gradle build
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}

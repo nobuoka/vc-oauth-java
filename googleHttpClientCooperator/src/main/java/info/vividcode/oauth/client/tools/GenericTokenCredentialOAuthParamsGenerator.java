@@ -1,5 +1,5 @@
 /*
-Copyright 2014 NOBUOKA Yu
+Copyright 2014, 2017 NOBUOKA Yu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ limitations under the License.
 package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.OAuthCredentialsHolder;
-import info.vividcode.util.oauth.OAuthRequestHelper;
-import info.vividcode.util.oauth.OAuthRequestHelper.ParamList;
 
-import java.util.Date;
+import java.time.Clock;
+import java.util.List;
 
 public class GenericTokenCredentialOAuthParamsGenerator implements OAuthParamsGenerator {
 
@@ -31,17 +30,9 @@ public class GenericTokenCredentialOAuthParamsGenerator implements OAuthParamsGe
     }
 
     @Override
-    public ParamList generate(OAuthCredentialsHolder auth, String signatureMethod) {
-        return OAuthRequestHelper.ParamList.fromArray(
-            new String[][]{
-                    { "oauth_consumer_key", auth.getClientIdentifier() },
-                    { "oauth_token", auth.getTokenIdentifier() },
-                    { "oauth_nonce", OAuthRequestHelper.generateNonce() },
-                    { "oauth_signature_method", signatureMethod },
-                    { "oauth_timestamp", Long.toString(new Date().getTime() / 1000) },
-                    { "oauth_version", "1.0" },
-                    { "oauth_verifier", mVerifier },
-                  } );
+    public List<kotlin.Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
+        return GenericOAuthParamsGenerator.generator.forAccessToken(
+                auth.getClientIdentifier(), auth.getTokenIdentifier(), mVerifier, signatureMethod, Clock.systemDefaultZone());
     }
 
 }

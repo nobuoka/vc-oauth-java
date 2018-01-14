@@ -1,5 +1,5 @@
 /*
-Copyright 2014 NOBUOKA Yu
+Copyright 2014, 2017 NOBUOKA Yu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.OAuth;
 import info.vividcode.oauth.OAuthCredentialsHolder;
-import info.vividcode.oauth.OAuthSignature;
+import info.vividcode.oauth.OAuthSignatures;
 import info.vividcode.util.oauth.OAuthEncoder;
-import info.vividcode.util.oauth.OAuthRequestHelper.Param;
-import info.vividcode.util.oauth.OAuthRequestHelper.ParamList;
+import kotlin.Pair;
 
 import java.net.URL;
+import java.util.List;
 
 public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
 
@@ -79,7 +79,7 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
 
     public void sign(T req) {
         // OAuth 関係のパラメータ。
-        ParamList protocolParams = mOAuthParamListGenerator.generate(this, "HMAC-SHA1");
+        List<Pair<String, String>> protocolParams = mOAuthParamListGenerator.generate(this, "HMAC-SHA1");
         // Signature base string の生成。
         String signatureBaseString = generateSignatureBaseString(req, protocolParams);
 
@@ -87,13 +87,13 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
                 OAuthEncoder.encode(mClientSharedSecret) + '&' +
                 OAuthEncoder.encode(mTokenSharedSecret);
 
-        String signature = OAuthSignature.makeSignatureWithHmacSha1(secrets, signatureBaseString);
-        protocolParams.add(new Param("oauth_signature", signature));
+        String signature = OAuthSignatures.makeSignatureWithHmacSha1(secrets, signatureBaseString);
+        protocolParams.add(new Pair<String, String>("oauth_signature", signature));
 
         mRequestHandler.setAuthorizationHeader(req, getAuthorizationHeaderString(protocolParams, ""));
     }
 
-    private String generateSignatureBaseString(T req, ParamList protocolParams) {
+    private String generateSignatureBaseString(T req, List<Pair<String, String>> protocolParams) {
         String method = mRequestHandler.getRequestMethod(req);
         URL url = mRequestHandler.getUrl(req);
         String contentType = mRequestHandler.getContentType(req);
@@ -103,13 +103,13 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
         return OAuth.generateSignatureBaseString(method, url, protocolParams, reqBody);
     }
 
-    private String getAuthorizationHeaderString(ParamList protocolParams, String realm) {
+    private String getAuthorizationHeaderString(List<Pair<String, String>> protocolParams, String realm) {
         StringBuilder sb = new StringBuilder();
         sb.append("OAuth realm=\"").append(realm).append('"');
-        for (Param p : protocolParams) {
+        for (Pair<String, String> p : protocolParams) {
             sb.append(", ");
-            sb.append(OAuthEncoder.encode(p.getKey()));
-            sb.append("=\"").append(OAuthEncoder.encode(p.getValue())).append('"');
+            sb.append(OAuthEncoder.encode(p.getFirst()));
+            sb.append("=\"").append(OAuthEncoder.encode(p.getSecond())).append('"');
         }
         return sb.toString();
     }

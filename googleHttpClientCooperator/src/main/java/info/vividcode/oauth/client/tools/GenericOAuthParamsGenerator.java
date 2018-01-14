@@ -16,25 +16,33 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
+import info.vividcode.oauth.NextIntEnv;
 import info.vividcode.oauth.OAuthCredentialsHolder;
+import info.vividcode.oauth.OAuthProtocolParametersGenerator;
 import info.vividcode.util.oauth.OAuthRequestHelper;
-import info.vividcode.util.oauth.OAuthRequestHelper.ParamList;
+import kotlin.Pair;
+import kotlin.jvm.functions.Function1;
+import org.jetbrains.annotations.NotNull;
 
+import java.security.SecureRandom;
+import java.time.Clock;
 import java.util.Date;
+import java.util.List;
 
 public class GenericOAuthParamsGenerator implements OAuthParamsGenerator {
 
+    static final OAuthProtocolParametersGenerator generator = new OAuthProtocolParametersGenerator<>(new NextIntEnv() {
+        private Function1<Integer, Integer> nextInt = new SecureRandom()::nextInt;
+        @NotNull
+        @Override
+        public Function1<Integer, Integer> getNextInt() {
+            return nextInt;
+        }
+    });
+
     @Override
-    public ParamList generate(OAuthCredentialsHolder auth, String signatureMethod) {
-        return OAuthRequestHelper.ParamList.fromArray(
-            new String[][]{
-                    { "oauth_consumer_key", auth.getClientIdentifier() },
-                    { "oauth_token", auth.getTokenIdentifier() },
-                    { "oauth_nonce", OAuthRequestHelper.generateNonce() },
-                    { "oauth_signature_method", signatureMethod },
-                    { "oauth_timestamp", Long.toString(new Date().getTime() / 1000) },
-                    { "oauth_version", "1.0" },
-                  } );
+    public List<Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
+        return generator.forNormalRequest(auth, signatureMethod, Clock.systemDefaultZone());
     }
 
 }
