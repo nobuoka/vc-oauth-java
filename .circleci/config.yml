@@ -33,4 +33,5 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
+            - ~/.m2
           key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
