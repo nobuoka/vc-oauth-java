@@ -33,7 +33,12 @@ plugins {
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
     licenseAgree = 'yes'
-    publishAlwaysIf(System.getenv('CI') == 'true')
+
+    boolean onCi = System.getenv('CI') == 'true'
+    publishAlwaysIf(onCi)
+    if (onCi) tag 'CI'
+    String buildUrl = System.getenv('CIRCLE_BUILD_URL')
+    if (buildUrl != null) link 'Build URL', buildUrl
 }
 
 group ext.group
