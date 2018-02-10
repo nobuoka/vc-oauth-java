@@ -1,10 +1,14 @@
 package info.vividcode.oauth.protocol
 
-import info.vividcode.oauth.ParamList
-import info.vividcode.oauth.key
-import info.vividcode.oauth.value
+import info.vividcode.oauth.*
 
 object ParameterTransmission {
+
+    /**
+     * See : [OAuth 1.0 Specification - 3.5.1 Authorization Header](https://tools.ietf.org/html/rfc5849#section-3.5.1)
+     */
+    fun getAuthorizationHeaderString(protocolParams: ProtocolParameterSet, realm: String): String =
+            getAuthorizationHeaderString(protocolParams.map { Param(it.name.toString(), it.value.toString()) }, realm)
 
     /**
      * See : [OAuth 1.0 Specification - 3.5.1 Authorization Header](https://tools.ietf.org/html/rfc5849#section-3.5.1)
