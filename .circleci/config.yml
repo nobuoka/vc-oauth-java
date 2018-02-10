@@ -24,18 +24,17 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
-      - run: gradle build
+      - run: gradle build publishToMavenLocal
       - store_test_results:
           path: core/build/test-results
 
       - save_cache:
           paths:
             - ~/.gradle
-            - ~/.m2
           key: v1-dependencies-{{ checksum "cache-key-source-gradle" }}
 
       - persist_to_workspace:
@@ -55,18 +54,17 @@ jobs:
           at: .
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}-publish
-          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
+            - v1-dependencies-{{ checksum "cache-key-source-gradle" }}-publish
+            - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
 
       - run:
           name: Publish
           command: |
-            ./gradlew publishToMavenLocal artifactoryDeploy
+            ./gradlew artifactoryPublish
 
       - save_cache:
           paths:
             - ~/.gradle
-            - ~/.m2
           key: v1-dependencies-{{ checksum "cache-key-source-gradle" }}-publish
 
 workflows:
