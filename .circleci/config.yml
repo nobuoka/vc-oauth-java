@@ -46,7 +46,6 @@ jobs:
   publish-snapshots-to-artifactory:
     docker:
       - image: circleci/openjdk:8-jdk
-    context: org-global-artifactory
     environment:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx1600m
@@ -76,6 +75,7 @@ workflows:
     jobs:
       - build
       - publish-snapshots-to-artifactory:
+          context: org-global-artifactory
           requires:
             - build
           filters:
