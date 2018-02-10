@@ -20,11 +20,11 @@ jobs:
               md5sum gradle/wrapper/gradle-wrapper.properties
               md5sum settings.gradle
               md5sum $(find . -name 'build.gradle')
-            } > ~/cache-key-source-gradle
+            } > cache-key-source-gradle
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
+          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
@@ -36,7 +36,7 @@ jobs:
           paths:
             - ~/.gradle
             - ~/.m2
-          key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
+          key: v1-dependencies-{{ checksum "cache-key-source-gradle" }}
 
       - persist_to_workspace:
           root: .
@@ -54,11 +54,21 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}-publish
+          - v1-dependencies-{{ checksum "cache-key-source-gradle" }}
 
       - run:
           name: Publish
           command: |
             ./gradlew publishToMavenLocal artifactoryDeploy
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "cache-key-source-gradle" }}-publish
 
 workflows:
   version: 2
