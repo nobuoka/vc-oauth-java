@@ -16,8 +16,6 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
-import info.vividcode.oauth.OAuthIdentifiers;
-
 import java.time.Clock;
 import java.util.List;
 

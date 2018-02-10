@@ -17,7 +17,6 @@ limitations under the License.
 package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.NextIntEnv;
-import info.vividcode.oauth.OAuthIdentifiers;
 import info.vividcode.oauth.OAuthProtocolParametersGenerator;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;

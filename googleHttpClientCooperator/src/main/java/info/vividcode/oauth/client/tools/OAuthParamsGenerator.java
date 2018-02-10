@@ -16,7 +16,6 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
-import info.vividcode.oauth.OAuthIdentifiers;
 import kotlin.Pair;
 
 import java.util.List;

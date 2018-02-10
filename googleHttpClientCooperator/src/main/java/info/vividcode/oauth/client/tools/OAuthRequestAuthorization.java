@@ -18,7 +18,6 @@ package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.HttpRequest;
 import info.vividcode.oauth.OAuth;
-import info.vividcode.oauth.OAuthIdentifiers;
 import info.vividcode.oauth.protocol.Signatures;
 import info.vividcode.util.oauth.OAuthEncoder;
 import kotlin.Pair;
