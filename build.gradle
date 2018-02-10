@@ -3,8 +3,7 @@ buildscript {
         group = 'info.vividcode.oauth'
         version = '0.2.0-SNAPSHOT'
 
-        junitVersion = '5.0.0-M4'
-        junitGradlePluginVersion = '1.0.0-M4'
+        junitGradlePluginVersion = '1.0.3'
 
         Map<String, String> env = System.getenv()
         releaseProperties = [
@@ -24,7 +23,6 @@ buildscript {
     dependencies {
         classpath "org.junit.platform:junit-platform-gradle-plugin:${rootProject.ext.junitGradlePluginVersion}"
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.+'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
 
