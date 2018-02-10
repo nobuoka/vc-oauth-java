@@ -16,12 +16,15 @@ limitations under the License.
 
 package info.vividcode.oauth
 
+import info.vividcode.oauth.protocol.PercentEncode
+import info.vividcode.oauth.protocol.Signatures
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
 import java.net.URL
 import kotlin.test.assertEquals
 
 object OAuthSpec : Spek({
+
     describe("signature generation with HMAC-SHA1 (section 9.2)") {
         data class Parameters(val consumerSecret: String, val tokenSecret: String, val baseString: String)
 
@@ -37,7 +40,7 @@ object OAuthSpec : Spek({
         ).forEach {
             on("passing parameter `${it.first}`") {
                 it("should be generate `${it.second}`") {
-                    assertEquals(it.second, OAuthSignatures.makeSignatureWithHmacSha1(
+                    assertEquals(it.second, Signatures.makeSignatureWithHmacSha1(
                             "${it.first.consumerSecret}&${it.first.tokenSecret}", it.first.baseString))
                 }
             }
@@ -60,7 +63,7 @@ object OAuthSpec : Spek({
         ).forEach {
             on("passing parameter `${it.first}`") {
                 it("should be generate `${it.second}`") {
-                    assertEquals(it.second, OAuthPercentEncoder.encode(it.first))
+                    assertEquals(it.second, PercentEncode.encode(it.first))
                 }
             }
         }
@@ -69,7 +72,7 @@ object OAuthSpec : Spek({
     // See : https://tools.ietf.org/html/rfc5849#section-3.4.1.2 (3.4.1.2.  Base String URI)
     describe("generation of URL base string from URL") {
         fun testBody(expectedUrl: String, testUrl: URL): TestBody.() -> Unit = {
-            val actual = OAuth.generateBaseStringUri(testUrl)
+            val actual = OAuth.DEFAULT.generateBaseStringUri(testUrl)
             assertEquals(expectedUrl, actual)
         }
 

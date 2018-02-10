@@ -16,46 +16,73 @@ limitations under the License.
 
 package info.vividcode.oauth
 
+import info.vividcode.oauth.protocol.PercentEncode
+import info.vividcode.oauth.protocol.Signatures
+import info.vividcode.oauth.protocol.UrlEncoded
 import java.net.URL
+import java.security.SecureRandom
+import java.time.Clock
 import java.util.*
 
-object OAuth {
+class OAuth(env: Env) {
 
-    fun generateSignature(
-            httpRequestMethod: String, url: URL, protocolParams: ParamList,
-            clientSharedSecret: String, tokenSharedSecret: String): String {
-        val signatureBaseString = generateSignatureBaseString(httpRequestMethod, url, protocolParams, null)
-        val secrets = OAuthPercentEncoder.encode(clientSharedSecret) + '&' + OAuthPercentEncoder.encode(tokenSharedSecret)
-        return OAuthSignatures.makeSignatureWithHmacSha1(secrets, signatureBaseString)
+    interface Env : NextIntEnv, ClockEnv
+
+    companion object {
+        @JvmStatic
+        val DEFAULT: OAuth = OAuth(object : Env {
+            override val nextInt: (Int) -> Int = SecureRandom.getInstanceStrong()::nextInt
+            override val clock: Clock = Clock.systemDefaultZone()
+        })
     }
 
-    @JvmStatic
-    fun generateSignatureBaseString(
-            httpRequestMethod: String, url: URL, protocolParams: ParamList?, requestBody: String?): String {
-        var httpRequestMethod = httpRequestMethod
+    private val nonceGenerator = OAuthNonceGenerator(env)
+    private val clock = env.clock
+
+    fun generateProtocolParametersSigningWithHmacSha1(
+            httpRequest: HttpRequest, clientCredentials: OAuthCredentials, temporaryOrTokenCredentials: OAuthCredentials?,
+            additionalProtocolParameters: List<ProtocolParameter<*>>? = null
+    ): ProtocolParameterSet {
+        val protocolParams = OAuthProtocolParameters.createProtocolParametersExcludingSignature(
+                clientCredentials.identifier,
+                temporaryOrTokenCredentials?.identifier,
+                OAuthProtocolParameters.Options.HmcSha1Signing(nonceGenerator.generateNonceString(), clock.instant()),
+                additionalProtocolParameters
+        )
+        val signatureBaseString = generateSignatureBaseString(httpRequest, protocolParams)
+        val secrets = PercentEncode.encode(clientCredentials.sharedSecret) +
+                '&' + PercentEncode.encode(temporaryOrTokenCredentials?.sharedSecret ?: "")
+        val signature = when (protocolParams.get(ProtocolParameter.SignatureMethod)) {
+            is ProtocolParameter.SignatureMethod.HmacSha1 -> Signatures.makeSignatureWithHmacSha1(secrets, signatureBaseString)
+            is ProtocolParameter.SignatureMethod.Plaintext -> secrets
+            null -> throw RuntimeException("No signature method specified")
+        }
+        return ProtocolParameterSet.Builder().add(protocolParams).add(ProtocolParameter.Signature(signature)).build()
+    }
+
+    fun generateSignatureBaseString(httpRequest: HttpRequest, protocolParams: ProtocolParameterSet): String =
+            generateSignatureBaseString(httpRequest, protocolParams.map { Param(it.name.toString(), it.value.toString()) })
+
+    fun generateSignatureBaseString(httpRequest: HttpRequest, protocolParams: ParamList): String {
         val sb = StringBuilder()
 
-        // 1.  The HTTP request method in uppercase.  For example: "HEAD",
-        //     "GET", "POST", etc.  If the request uses a custom HTTP method, it
-        //     MUST be encoded (Section 3.6).
-        httpRequestMethod = httpRequestMethod.toUpperCase(Locale.US)
-        sb.append(OAuthPercentEncoder.encode(httpRequestMethod))
+        // 1.  The HTTP request method in uppercase.  For example: "HEAD", "GET", "POST", etc.
+        //     If the request uses a custom HTTP method, it MUST be encoded (Section 3.6).
+        val upperHttpRequestMethod = httpRequest.method.toUpperCase(Locale.US)
+        sb.append(PercentEncode.encode(upperHttpRequestMethod))
         // 2.  An "&" character (ASCII code 38).
         sb.append('&')
-        // 3.  The base string URI from Section 3.4.1.2, after being encoded
-        //     (Section 3.6).
-        val baseStringUri = generateBaseStringUri(url)
-        sb.append(OAuthPercentEncoder.encode(baseStringUri))
+        // 3.  The base string URI from Section 3.4.1.2, after being encoded (Section 3.6).
+        val baseStringUri = generateBaseStringUri(httpRequest.url)
+        sb.append(PercentEncode.encode(baseStringUri))
         // 4.  An "&" character (ASCII code 38).
         sb.append('&')
-        // 5.  The request parameters as normalized in Section 3.4.1.3.2, after
-        //     being encoded (Section 3.6).
+        // 5.  The request parameters as normalized in Section 3.4.1.3.2, after being encoded (Section 3.6).
         val encodedReqParams =
-                (protocolParams?.map {
-                    Param(OAuthPercentEncoder.encode(it.key), OAuthPercentEncoder.encode(it.value))
-                } ?: emptyList()) + collectPercentEncodedRequestParameters(url, requestBody)
+                (protocolParams.map { Param(PercentEncode.encode(it.key), PercentEncode.encode(it.value)) }) +
+                        collectPercentEncodedRequestParameters(httpRequest.url, httpRequest.wwwFormUrlEncodedRequestBody)
         val normalizedRequestParameters = normalizePercentEncodedParameters(encodedReqParams)
-        sb.append(OAuthPercentEncoder.encode(normalizedRequestParameters))
+        sb.append(PercentEncode.encode(normalizedRequestParameters))
 
         return sb.toString()
     }
@@ -63,15 +90,12 @@ object OAuth {
     fun generateBaseStringUri(url: URL): String {
         val sb = StringBuilder()
 
-        // The scheme, authority, and path of the request resource URI [RFC3986]
-        // are included by constructing an "http" or "https" URI representing
-        // the request resource (without the query or fragment) as follows:
+        // The scheme, authority, and path of the request resource URI [RFC3986] are included by constructing
+        // an "http" or "https" URI representing the request resource (without the query or fragment) as follows:
         //     1.  The scheme and host MUST be in lowercase.
-        //     2.  The host and port values MUST match the content of the HTTP
-        //         request "Host" header field.
-        //     3.  The port MUST be included if it is not the default port for the
-        //         scheme, and MUST be excluded if it is the default.  Specifically,
-        //         the port MUST be excluded when making an HTTP request [RFC2616]
+        //     2.  The host and port values MUST match the content of the HTTP request "Host" header field.
+        //     3.  The port MUST be included if it is not the default port for the scheme, and MUST be excluded
+        //         if it is the default.  Specifically, the port MUST be excluded when making an HTTP request [RFC2616]
         //         to port 80 or when making an HTTPS request [RFC2818] to port 443.
         //         All other non-default port numbers MUST be included.
         val scheme = url.protocol.toLowerCase(Locale.US)
@@ -154,7 +178,7 @@ object OAuth {
             if ("oauth_signature" == encKv[0]) continue
             val key = UrlEncoded.decode(encKv[0])
             val `val` = UrlEncoded.decode(if (encKv.size == 1) "" else encKv[1])
-            p.add(Param(OAuthPercentEncoder.encode(key), OAuthPercentEncoder.encode(`val`)))
+            p.add(Param(PercentEncode.encode(key), PercentEncode.encode(`val`)))
         }
     }
 
@@ -166,15 +190,6 @@ object OAuth {
             sb.append(p.key).append('=').append(p.value)
         }
         return sb.toString()
-    }
-
-    fun getAuthorizationHeaderString(protocolParams: ParamList, realm: String): String {
-        val sb = StringBuilder()
-        sb.append("OAuth realm=\"").append(realm).append('"')
-        val pp = protocolParams.stream()
-                .map { p -> OAuthPercentEncoder.encode(p.key) + "=\"" + OAuthPercentEncoder.encode(p.value) + '"' }
-                .reduce({ s1, s2 -> s1 + ", " + s2 }).orElse("")
-        return "OAuth " + pp
     }
 
 }

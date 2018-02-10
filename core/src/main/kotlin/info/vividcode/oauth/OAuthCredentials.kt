@@ -16,21 +16,11 @@ limitations under the License.
 
 package info.vividcode.oauth
 
-interface OAuthCredentialsHolder {
-    val clientIdentifier: String
-    val clientSharedSecret: String
-
-    val tokenIdentifier: String
-    val tokenSharedSecret: String
-    fun setClientCredential(identifier: String, secret: String)
-    fun setTokenCredential(identifier: String, secret: String)
-}
-
-data class ClientCredential(
-        val identifier: String,
-        val sharedSecret: String
-)
-data class TokenCredential(
+/**
+ * Pair of a unique identifier and a matching shared secret.
+ * There are three classes of credentials in OAuth protocol: client credentials, temporary credentials, and token credentials.
+ */
+data class OAuthCredentials(
         val identifier: String,
         val sharedSecret: String
 )

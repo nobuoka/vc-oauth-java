@@ -16,9 +16,10 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
+import info.vividcode.oauth.HttpRequest;
 import info.vividcode.oauth.OAuth;
 import info.vividcode.oauth.OAuthCredentialsHolder;
-import info.vividcode.oauth.OAuthSignatures;
+import info.vividcode.oauth.protocol.Signatures;
 import info.vividcode.util.oauth.OAuthEncoder;
 import kotlin.Pair;
 
@@ -87,7 +88,7 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
                 OAuthEncoder.encode(mClientSharedSecret) + '&' +
                 OAuthEncoder.encode(mTokenSharedSecret);
 
-        String signature = OAuthSignatures.makeSignatureWithHmacSha1(secrets, signatureBaseString);
+        String signature = Signatures.makeSignatureWithHmacSha1(secrets, signatureBaseString);
         protocolParams.add(new Pair<String, String>("oauth_signature", signature));
 
         mRequestHandler.setAuthorizationHeader(req, getAuthorizationHeaderString(protocolParams, ""));
@@ -100,7 +101,7 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
         String reqBody = ("application/x-www-form-urlencoded".equals(contentType) ?
                 mRequestHandler.getRequestBody(req) :
                 null);
-        return OAuth.generateSignatureBaseString(method, url, protocolParams, reqBody);
+        return OAuth.getDEFAULT().generateSignatureBaseString(new HttpRequest(method, url, reqBody), protocolParams);
     }
 
     private String getAuthorizationHeaderString(List<Pair<String, String>> protocolParams, String realm) {

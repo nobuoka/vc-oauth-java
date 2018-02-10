@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package info.vividcode.oauth
+package info.vividcode.oauth.protocol
 
 import java.io.ByteArrayOutputStream
 

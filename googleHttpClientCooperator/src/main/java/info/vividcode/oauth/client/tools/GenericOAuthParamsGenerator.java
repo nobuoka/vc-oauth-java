@@ -19,14 +19,12 @@ package info.vividcode.oauth.client.tools;
 import info.vividcode.oauth.NextIntEnv;
 import info.vividcode.oauth.OAuthCredentialsHolder;
 import info.vividcode.oauth.OAuthProtocolParametersGenerator;
-import info.vividcode.util.oauth.OAuthRequestHelper;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.SecureRandom;
 import java.time.Clock;
-import java.util.Date;
 import java.util.List;
 
 public class GenericOAuthParamsGenerator implements OAuthParamsGenerator {
@@ -42,7 +40,7 @@ public class GenericOAuthParamsGenerator implements OAuthParamsGenerator {
 
     @Override
     public List<Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
-        return generator.forNormalRequest(auth, signatureMethod, Clock.systemDefaultZone());
+        return generator.forNormalRequest(auth.getClientIdentifier(), auth.getTokenIdentifier(), signatureMethod, Clock.systemDefaultZone());
     }
 
 }

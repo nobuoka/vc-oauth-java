@@ -46,10 +46,14 @@ class OAuthProtocolParametersGenerator<E> constructor(env: E) where E : NextIntE
         )
     }
 
-    fun forNormalRequest(auth: OAuthCredentialsHolder, signatureMethod: String, clock: Clock): ParamList {
+    fun forNormalRequest(clientIdentifier: String, tokenIdentifier: String, signatureMethod: String, clock: Clock): ParamList {
+        val s: ProtocolParameterSet? = null
+        s?.get(ProtocolParameter.ConsumerKey)?.name?.toString()
+        println(ProtocolParameter.ConsumerKey)
+
         return listOf(
-                Param("oauth_consumer_key", auth.clientIdentifier),
-                Param("oauth_token", auth.tokenIdentifier),
+                Param("oauth_consumer_key", clientIdentifier),
+                Param("oauth_token", tokenIdentifier),
                 Param("oauth_nonce", nonceGenerator.generateNonceString()),
                 Param("oauth_signature_method", signatureMethod),
                 Param("oauth_timestamp", Instant.now(clock).epochSecond.toString()),
@@ -57,4 +61,12 @@ class OAuthProtocolParametersGenerator<E> constructor(env: E) where E : NextIntE
         )
     }
 
+}
+
+fun main(args: Array<String>) {
+    ProtocolParameterSet.Builder()
+            .add(ProtocolParameter.ConsumerKey(""))
+            .add(ProtocolParameter.Nonce(""))
+            .add(ProtocolParameter.SignatureMethod.HmacSha1)
+    println(ProtocolParameter.ConsumerKey)
 }

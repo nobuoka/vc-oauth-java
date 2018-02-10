@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package info.vividcode.oauth
+package info.vividcode.oauth.protocol
 
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -22,19 +22,17 @@ import java.nio.charset.StandardCharsets
 /**
  * The OAuth 1.0 Protocol の仕様に合う形で文字列をパーセントエンコードする機能を提供するクラス。
  */
-object OAuthPercentEncoder {
+object PercentEncode {
 
     /** "0123456789ABCDEF" の ASCII バイト列  */
     private val BS = byteArrayOf(48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70)
 
     /** 指定のバイトをパーセントエンコードする必要があるかどうかの真理値を格納した配列
      * (インデックスがバイト値に対応. ただし最上位ビットが 1 のものは含まない)  */
-    private val NEED_ENCODE = BooleanArray(0x7F + 1)
-    // NEED_ENCODING の初期化
-    init {
-        for (i in NEED_ENCODE.indices) {
+    private val NEED_ENCODE = BooleanArray(0x7F + 1).also {
+        for (i in it.indices) {
             // a(97)-z(122), A(65)-Z(90), 0(48)-9(57), -(45), .(46), _(95), ~(126)
-            NEED_ENCODE[i] = !(i in 65..90 || i in 97..122 || i in 48..57 || i == 45 || i == 46 || i == 95 || i == 126)
+            it[i] = !(i in 65..90 || i in 97..122 || i in 48..57 || i == 45 || i == 46 || i == 95 || i == 126)
         }
     }
 

@@ -6,9 +6,6 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-
-    working_directory: ~/repo
-
     environment:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx1600m

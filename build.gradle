@@ -1,0 +1,69 @@
+buildscript {
+    ext {
+        group = 'info.vividcode.oauth'
+        version = '0.2.0-SNAPSHOT'
+
+        junitVersion = '5.0.0-M4'
+        junitGradlePluginVersion = '1.0.0-M4'
+
+        Map<String, String> env = System.getenv()
+        releaseProperties = [
+                artifactIdBase : 'oauth',
+                artifactoryUserName : project.hasProperty('artifactory.user_name') ?
+                        project.property('artifactory.user_name') :
+                        env.getOrDefault('ARTIFACTORY_USER_NAME', 'ARTIFACTORY-USER_NAME-NOT-SPECIFIED'),
+                artifactoryApiKey : project.hasProperty('artifactory.api_key') ?
+                        project.property('artifactory.api_key') :
+                        env.getOrDefault('ARTIFACTORY_API_KEY', 'ARTIFACTORY-API-KEY-NOT-SPECIFIED'),
+        ]
+    }
+
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.junit.platform:junit-platform-gradle-plugin:${rootProject.ext.junitGradlePluginVersion}"
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.+'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+    }
+}
+
+group ext.group
+version ext.version
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    group rootProject.ext.group
+    version rootProject.ext.version
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+evaluationDependsOn(':core')
+evaluationDependsOn(':googleHttpClientCooperator')
+
+apply plugin: 'com.jfrog.artifactory'
+artifactory {
+    contextUrl = 'https://oss.jfrog.org'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = releaseProperties.artifactoryUserName
+            password = releaseProperties.artifactoryApiKey
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'com.jfrog.artifactory'
+    artifactoryPublish {
+        publications(publishing.publications.maven)
+    }
+}

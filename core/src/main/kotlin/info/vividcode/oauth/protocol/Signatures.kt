@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package info.vividcode.oauth
+package info.vividcode.oauth.protocol
 
 import java.nio.charset.StandardCharsets
 import java.security.InvalidKeyException
@@ -23,7 +23,7 @@ import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-object OAuthSignatures {
+object Signatures {
 
     private val US_ASCII = StandardCharsets.US_ASCII
 

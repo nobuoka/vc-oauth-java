@@ -17,11 +17,10 @@ limitations under the License.
 package info.vividcode.oauth
 
 import java.nio.charset.StandardCharsets
-import java.security.SecureRandom
+import java.time.Clock
 
-interface NextIntEnv {
-    val nextInt: (Int) -> Int get() = SecureRandom()::nextInt
-}
+interface NextIntEnv { val nextInt: (Int) -> Int }
+interface ClockEnv { val clock: Clock }
 
 class OAuthNonceGenerator<E> constructor(private val env: E) where E : NextIntEnv {
 
