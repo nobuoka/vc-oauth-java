@@ -37,3 +37,37 @@ jobs:
             - ~/.gradle
             - ~/.m2
           key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  publish-snapshots-to-artifactory:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    context: org-global-artifactory
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx1600m
+
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Publish
+          command: |
+            ./gradlew publishToMavenLocal artifactoryDeploy
+
+workflows:
+  version: 2
+  build-publish:
+    jobs:
+      - build
+      - publish-snapshots-to-artifactory:
+          requires:
+            - build
+          filters:
+            branches:
+              only: dev
