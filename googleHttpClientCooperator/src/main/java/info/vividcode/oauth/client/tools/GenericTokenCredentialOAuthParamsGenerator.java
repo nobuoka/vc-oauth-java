@@ -16,7 +16,7 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
-import info.vividcode.oauth.OAuthCredentialsHolder;
+import info.vividcode.oauth.OAuthIdentifiers;
 
 import java.time.Clock;
 import java.util.List;
@@ -30,7 +30,7 @@ public class GenericTokenCredentialOAuthParamsGenerator implements OAuthParamsGe
     }
 
     @Override
-    public List<kotlin.Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
+    public List<kotlin.Pair<String, String>> generate(OAuthIdentifiers auth, String signatureMethod) {
         return GenericOAuthParamsGenerator.generator.forAccessToken(
                 auth.getClientIdentifier(), auth.getTokenIdentifier(), mVerifier, signatureMethod, Clock.systemDefaultZone());
     }

@@ -16,12 +16,7 @@ limitations under the License.
 
 package info.vividcode.oauth;
 
-public interface OAuthCredentialsHolder {
+public interface OAuthIdentifiers {
     String getClientIdentifier();
-    String getClientSharedSecret();
-    void setClientCredential(String identifier, String secret);
-
     String getTokenIdentifier();
-    String getTokenSharedSecret();
-    void setTokenCredential(String identifier, String secret);
 }

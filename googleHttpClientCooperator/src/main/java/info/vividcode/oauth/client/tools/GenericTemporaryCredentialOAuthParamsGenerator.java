@@ -16,7 +16,7 @@ limitations under the License.
 
 package info.vividcode.oauth.client.tools;
 
-import info.vividcode.oauth.OAuthCredentialsHolder;
+import info.vividcode.oauth.OAuthIdentifiers;
 import kotlin.Pair;
 
 import java.time.Clock;
@@ -31,7 +31,7 @@ public class GenericTemporaryCredentialOAuthParamsGenerator implements OAuthPara
     }
 
     @Override
-    public List<Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
+    public List<Pair<String, String>> generate(OAuthIdentifiers auth, String signatureMethod) {
         return GenericOAuthParamsGenerator.generator.forTemporaryCredentials(
                 auth.getClientIdentifier(), signatureMethod, mCallbackUrlStr, Clock.systemDefaultZone());
     }

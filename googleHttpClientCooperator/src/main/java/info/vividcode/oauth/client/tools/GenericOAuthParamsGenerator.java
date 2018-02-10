@@ -17,7 +17,7 @@ limitations under the License.
 package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.NextIntEnv;
-import info.vividcode.oauth.OAuthCredentialsHolder;
+import info.vividcode.oauth.OAuthIdentifiers;
 import info.vividcode.oauth.OAuthProtocolParametersGenerator;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
@@ -39,7 +39,7 @@ public class GenericOAuthParamsGenerator implements OAuthParamsGenerator {
     });
 
     @Override
-    public List<Pair<String, String>> generate(OAuthCredentialsHolder auth, String signatureMethod) {
+    public List<Pair<String, String>> generate(OAuthIdentifiers auth, String signatureMethod) {
         return generator.forNormalRequest(auth.getClientIdentifier(), auth.getTokenIdentifier(), signatureMethod, Clock.systemDefaultZone());
     }
 

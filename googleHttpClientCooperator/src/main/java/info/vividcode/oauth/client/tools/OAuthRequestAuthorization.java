@@ -18,7 +18,7 @@ package info.vividcode.oauth.client.tools;
 
 import info.vividcode.oauth.HttpRequest;
 import info.vividcode.oauth.OAuth;
-import info.vividcode.oauth.OAuthCredentialsHolder;
+import info.vividcode.oauth.OAuthIdentifiers;
 import info.vividcode.oauth.protocol.Signatures;
 import info.vividcode.util.oauth.OAuthEncoder;
 import kotlin.Pair;
@@ -26,44 +26,20 @@ import kotlin.Pair;
 import java.net.URL;
 import java.util.List;
 
-public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
+public class OAuthRequestAuthorization<T> implements OAuthIdentifiers {
 
     private String mClientIdentifier = "";
-    private String mClientSharedSecret = "";
 
     @Override
     public final String getClientIdentifier() {
         return mClientIdentifier;
     }
 
-    @Override
-    public final String getClientSharedSecret() {
-        return mClientSharedSecret;
-    }
-
-    @Override
-    public final void setClientCredential(String identifier, String secret) {
-        mClientIdentifier = identifier;
-        mClientSharedSecret = secret;
-    }
-
     private String mTokenIdentifier = "";
-    private String mTokenSharedSecret = "";
 
     @Override
     public final String getTokenIdentifier() {
         return mTokenIdentifier;
-    }
-
-    @Override
-    public final String getTokenSharedSecret() {
-        return mTokenSharedSecret;
-    }
-
-    @Override
-    public final void setTokenCredential(String identifier, String secret) {
-        mTokenIdentifier = identifier;
-        mTokenSharedSecret = secret;
     }
 
     private OAuthParamsGenerator mOAuthParamListGenerator;
@@ -84,6 +60,8 @@ public class OAuthRequestAuthorization<T> implements OAuthCredentialsHolder {
         // Signature base string の生成。
         String signatureBaseString = generateSignatureBaseString(req, protocolParams);
 
+        String mTokenSharedSecret = "";
+        String mClientSharedSecret = "";
         String secrets =
                 OAuthEncoder.encode(mClientSharedSecret) + '&' +
                 OAuthEncoder.encode(mTokenSharedSecret);
