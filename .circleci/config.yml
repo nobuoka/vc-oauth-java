@@ -29,6 +29,8 @@ jobs:
           - v1-dependencies-
 
       - run: gradle build
+      - store_test_results:
+          path: core/build/test-results
 
       - save_cache:
           paths:
