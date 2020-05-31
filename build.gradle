@@ -3,8 +3,6 @@ buildscript {
         group = 'info.vividcode.oauth'
         version = '0.2.0-SNAPSHOT'
 
-        junitGradlePluginVersion = '1.0.3'
-
         Map<String, String> env = System.getenv()
         releaseProperties = [
                 artifactIdBase : 'oauth',
@@ -21,18 +19,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.junit.platform:junit-platform-gradle-plugin:${rootProject.ext.junitGradlePluginVersion}"
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1'
     }
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.11'
+    id 'com.gradle.build-scan' version '2.0.2'
 }
 
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
 
     boolean onCi = System.getenv('CI') == 'true'
     publishAlwaysIf(onCi)
