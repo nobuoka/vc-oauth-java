@@ -17,10 +17,10 @@ tasks.withType(Javadoc) {
 }
 
 dependencies {
-    compile project(':core')
+    implementation project(':core')
 
-    compile 'com.google.http-client:google-http-client:1.19.0'
-    compile 'info.vividcode.utils:wscutils:0.2.0'
+    implementation 'com.google.http-client:google-http-client:1.19.0'
+    implementation 'info.vividcode.utils:wscutils:0.2.0'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
