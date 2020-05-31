@@ -1,7 +1,7 @@
 buildscript {
     ext {
         kotlin_version = '1.2.21'
-        spek_version = '1.1.5'
+        spek_version = '1.2.1'
     }
 
     repositories {
@@ -35,10 +35,6 @@ def javaApiUrl = 'http://docs.oracle.com/javase/8/docs/api/'
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
     options.links(javaApiUrl)
-}
-
-repositories {
-    maven { url "http://dl.bintray.com/jetbrains/spek" }
 }
 
 // setup dependencies
