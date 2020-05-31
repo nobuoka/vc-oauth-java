@@ -19,7 +19,6 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 archivesBaseName = 'oauth-core'
 description = "Kotlin implementation of OAuth 1.0 Protocol."
@@ -46,13 +45,12 @@ dependencies {
     // spek-api depends on old version of kotlin-reflect, so an explicit dependency for newer version is provided
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spek_version"
+    testRuntimeOnly "org.junit.platform:junit-platform-runner:1.6.2"
 }
 
-junitPlatform {
-    filters {
-        engines {
-            include 'spek'
-        }
+test {
+    useJUnitPlatform {
+        includeEngines "spek"
     }
 }
 
