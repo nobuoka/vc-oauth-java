@@ -1,1 +1,18 @@
+plugins {
+    id "com.gradle.enterprise" version "3.3.3"
+}
+
 include 'core', 'googleHttpClientCooperator'
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+
+        boolean onCi = System.getenv('CI') == 'true'
+        publishAlwaysIf(onCi)
+        if (onCi) tag 'CI'
+        String buildUrl = System.getenv('CIRCLE_BUILD_URL')
+        if (buildUrl != null) link 'Build URL', buildUrl
+    }
+}

@@ -19,23 +19,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.15.2'
     }
-}
-
-plugins {
-    id 'com.gradle.build-scan' version '2.0.2'
-}
-
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
-
-    boolean onCi = System.getenv('CI') == 'true'
-    publishAlwaysIf(onCi)
-    if (onCi) tag 'CI'
-    String buildUrl = System.getenv('CIRCLE_BUILD_URL')
-    if (buildUrl != null) link 'Build URL', buildUrl
 }
 
 group ext.group
