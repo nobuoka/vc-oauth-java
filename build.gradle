@@ -1,7 +1,7 @@
 buildscript {
     ext {
         group = 'info.vividcode.oauth'
-        version = '0.2.0-SNAPSHOT'
+        version = '0.3.0-SNAPSHOT'
 
         Map<String, String> env = System.getenv()
         releaseProperties = [
