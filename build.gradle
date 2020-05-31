@@ -22,7 +22,7 @@ buildscript {
     }
     dependencies {
         classpath "org.junit.platform:junit-platform-gradle-plugin:${rootProject.ext.junitGradlePluginVersion}"
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.+'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1'
     }
 }
 
