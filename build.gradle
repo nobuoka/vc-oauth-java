@@ -43,6 +43,7 @@ subprojects {
 
 evaluationDependsOn(':core')
 evaluationDependsOn(':googleHttpClientCooperator')
+evaluationDependsOn(':ktor-twitter-login')
 
 apply plugin: 'com.jfrog.artifactory'
 artifactory {

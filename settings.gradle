@@ -2,7 +2,7 @@ plugins {
     id "com.gradle.enterprise" version "3.3.3"
 }
 
-include 'core', 'googleHttpClientCooperator'
+include 'core', 'googleHttpClientCooperator', 'ktor-twitter-login'
 
 gradleEnterprise {
     buildScan {
